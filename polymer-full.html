@@ -1,4 +1,4 @@
-<!DOCTYPE html><div hidden><!--
+<!DOCTYPE html><html><head><div hidden><!--
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -4854,4 +4854,4 @@ To change the bar color for unchecked state:
 </template>
 <script>Polymer("paper-toggle-button",{checked:false,trackStart:function(e){this._w=this.$.toggleBar.offsetLeft+this.$.toggleBar.offsetWidth;e.preventTap()},track:function(e){this._x=Math.min(this._w,Math.max(0,this.checked?this._w+e.dx:e.dx));this.$.toggleRadio.classList.add("dragging");var s=this.$.toggleRadio.style;s.webkitTransform=s.transform="translate3d("+this._x+"px,0,0)"},trackEnd:function(){var s=this.$.toggleRadio.style;s.webkitTransform=s.transform=null;this.$.toggleRadio.classList.remove("dragging");this.checked=Math.abs(this._x)>this._w/2},checkedChanged:function(){this.setAttribute("aria-pressed",Boolean(this.checked));this.fire("change")}});</script>
 </polymer-element>
-</div>
+</div></head><body></body></html>
