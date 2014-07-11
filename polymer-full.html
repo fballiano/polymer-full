@@ -1,4 +1,4 @@
-<div hidden><!--
+<!DOCTYPE html><div hidden><!--
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -86,7 +86,17 @@ a.push(this.property instanceof e?this.property.name:this.property.value),this.f
 <polymer-element name="core-ajax" attributes="url handleAs auto params response method headers body contentType withCredentials" assetpath="components/core-ajax/">
 <script>Polymer("core-ajax",{url:"",handleAs:"",auto:false,params:"",response:null,method:"",headers:null,body:null,contentType:"application/x-www-form-urlencoded",withCredentials:false,xhrArgs:null,ready:function(){this.xhr=document.createElement("core-xhr")},receive:function(response,xhr){if(this.isSuccess(xhr)){this.processResponse(xhr)}else{this.error(xhr)}this.complete(xhr)},isSuccess:function(xhr){var status=xhr.status||0;return!status||status>=200&&status<300},processResponse:function(xhr){var response=this.evalResponse(xhr);this.response=response;this.fire("core-response",{response:response,xhr:xhr})},error:function(xhr){var response=xhr.status+": "+xhr.responseText;this.fire("core-error",{response:response,xhr:xhr})},complete:function(xhr){this.fire("core-complete",{response:xhr.status,xhr:xhr})},evalResponse:function(xhr){return this[(this.handleAs||"text")+"Handler"](xhr)},xmlHandler:function(xhr){return xhr.responseXML},textHandler:function(xhr){return xhr.responseText},jsonHandler:function(xhr){var r=xhr.responseText;try{return JSON.parse(r)}catch(x){return r}},documentHandler:function(xhr){return xhr.response},blobHandler:function(xhr){return xhr.response},arraybufferHandler:function(xhr){return xhr.response},urlChanged:function(){if(!this.handleAs){var ext=String(this.url).split(".").pop();switch(ext){case"json":this.handleAs="json";break}}this.autoGo()},paramsChanged:function(){this.autoGo()},autoChanged:function(){this.autoGo()},autoGo:function(){if(this.auto){this.goJob=this.job(this.goJob,this.go,0)}},go:function(){var args=this.xhrArgs||{};args.body=this.body||args.body;args.params=this.params||args.params;if(args.params&&typeof args.params=="string"){args.params=JSON.parse(args.params)}args.headers=this.headers||args.headers||{};if(args.headers&&typeof args.headers=="string"){args.headers=JSON.parse(args.headers)}if(this.contentType){args.headers["content-type"]=this.contentType}if(this.handleAs==="arraybuffer"||this.handleAs==="blob"||this.handleAs==="document"){args.responseType=this.handleAs}args.withCredentials=this.withCredentials;args.callback=this.receive.bind(this);args.url=this.url;args.method=this.method;return args.url&&this.xhr.request(args)}});</script>
 </polymer-element>
-</div><div hidden><!--
+</div><div hidden>undefined</div><div hidden><!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<!--
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -180,7 +190,43 @@ the animation.
 <polymer-element name="core-animation-prop" attributes="name value" assetpath="components/core-animation/">
   <script>Polymer("core-animation-prop",{publish:{name:{value:"",reflect:true},value:{value:"",reflect:true}}});</script>
 </polymer-element>
-</div><div hidden><!--
+
+
+<!--
+@group Polymer Core Elements
+
+`core-animation-group` combines `core-animation` or `core-animation-group` elements to
+create a grouped web animation. The group may be parallel (type is `par`) or sequential
+(type is `seq`). Parallel groups play all the children elements simultaneously, and
+sequential groups play the children one after another.
+
+Example of an animation group to rotate and then fade an element:
+
+    <core-animation-group type="seq">
+      <core-animation id="fadeout" duration="500">
+        <core-animation-keyframe>
+          <core-animation-prop name="transform" value="rotate(0deg)"></core-animation-prop>
+          <core-animation-prop name="transform" value="rotate(45deg)"></core-animation-prop>
+        </core-animation-keyframe>
+      </core-animation>
+      <core-animation id="fadeout" duration="500">
+        <core-animation-keyframe>
+          <core-animation-prop name="opacity" value="1"></core-animation-prop>
+        </core-animation-keyframe>
+        <core-animation-keyframe>
+          <core-animation-prop name="opacity" value="0"></core-animation-prop>
+        </core-animation-keyframe>
+      </core-animation>
+    </core-animation-group>
+
+@element core-animation-group
+@status beta
+@homepage github.io
+-->
+<polymer-element name="core-animation-group" constructor="CoreAnimationGroup" extends="core-animation" attributes="type" assetpath="components/core-animation/">
+  <script>(function(){var ANIMATION_GROUPS={par:AnimationGroup,seq:AnimationSequence};Polymer("core-animation-group",{publish:{duration:{value:"auto",reflect:true},type:{value:"par",reflect:true}},typeChanged:function(){this.apply()},targetChanged:function(){if(this.target){this.doOnChildren(function(c){c.target=this.target}.bind(this))}},durationChanged:function(){if(this.duration&&this.duration!=="auto"){this.doOnChildren(function(c){if(!c.type&&(!c.duration||c.duration==="auto")){c.duration=this.duration}}.bind(this))}},doOnChildren:function(inFn){var children=this.children;if(!children.length){children=this.shadowRoot?this.shadowRoot.childNodes:[]}Array.prototype.forEach.call(children,function(c){c.apply&&inFn(c)},this)},makeAnimation:function(){return new ANIMATION_GROUPS[this.type](this.childAnimations,this.timingProps)},hasTarget:function(){var ht=this.target!==null;if(!ht){this.doOnChildren(function(c){ht=ht||c.hasTarget()}.bind(this))}return ht},apply:function(){this.durationChanged();this.targetChanged();this.doOnChildren(function(c){c.apply()});return this.super()},get childAnimationElements(){var list=[];this.doOnChildren(function(c){if(c.makeAnimation){list.push(c)}});return list},get childAnimations(){var list=[];this.doOnChildren(function(c){if(c.animation){list.push(c.animation)}});return list}})})();</script>
+</polymer-element>
+</div><div hidden>undefined</div><div hidden><!--
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -2793,6 +2839,67 @@ The `core-select` event signals selection change.
 <polymer-element name="core-menu" extends="core-selector" noscript="" assetpath="components/core-menu/"></polymer-element>
 </div><div hidden><!--
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE
+The complete set of authors may be found at http://polymer.github.io/AUTHORS
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS
+-->
+
+<!--
+Use to create nested menus inside of `core-menu` elements.
+
+    <core-menu selected="0">
+    
+      <core-submenu icon="settings" label="Topics">
+        <core-item label="Topic 1"></core-item>
+        <core-item label="Topic 2"></core-item>
+      </core-submenu>
+      
+      <core-submenu icon="settings" label="Favorites">
+        <core-item label="Favorite 1"></core-item>
+        <core-item label="Favorite 2"></core-item>
+        <core-item label="Favorite 3"></core-item>
+      </core-submenu>
+      
+    </core-menu>
+    
+There is a margin set on the submenu to indent the items.
+You can override the margin by doing:
+
+    core-submenu::shadow #submenu {
+      margin-left: 20px;
+    }
+
+@group Polymer Core Elements
+@element core-submenu
+@extends core-item
+-->
+
+
+
+
+
+<polymer-element name="core-submenu" attributes="selected selectedItem label icon src" assetpath="components/core-menu/">
+<template>
+
+  <style>:host{display:block;height:auto}:host(.core-selected,[active]){font-weight:initial}core-item{cursor:default}::content>core-item{cursor:default}#submenu{margin:0 0 0 44px}</style>
+
+  <core-item src="{{src}}" label="{{label}}" icon="{{icon}}" class="{{ {&apos;core-selected&apos; : active} | tokenList}}" on-tap="{{activate}}">
+    <content select=".item-content"></content>
+  </core-item>
+
+  <core-menu id="submenu" selected="{{selected}}" selecteditem="{{selectedItem}}">
+    <content></content>
+  </core-menu>
+
+  <core-collapse target="{{$.submenu}}" opened="{{opened}}"></core-collapse>
+
+</template>
+<script>Polymer("core-submenu",{publish:{active:{value:false,reflect:true}},opened:false,get items(){return this.$.submenu.items},hasItems:function(){return!!this.items.length},unselectAllItems:function(){this.$.submenu.selected=null;this.$.submenu.clearSelection()},activeChanged:function(){if(this.hasItems()){this.opened=this.active}if(!this.active){this.unselectAllItems()}},toggle:function(){this.opened=!this.opened},activate:function(){if(this.hasItems()&&this.active){this.toggle();this.unselectAllItems()}}});</script>
+</polymer-element>
+</div><div hidden><!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
@@ -3267,6 +3374,45 @@ lib.html:
 -->
 <polymer-element name="core-shared-lib" attributes="url notifyEvent callbackName" assetpath="components/core-shared-lib/">
 <script>(function(){Polymer("core-shared-lib",{notifyEvent:"core-shared-lib-load",ready:function(){if(!this.url&&this.defaultUrl){this.url=this.defaultUrl}},urlChanged:function(){require(this.url,this,this.callbackName)},provide:function(){this.async("notify")},notify:function(){this.fire(this.notifyEvent,arguments)}});var apiMap={};function require(url,notifiee,callbackName){var name=nameFromUrl(url);var loader=apiMap[name];if(!loader){loader=apiMap[name]=new Loader(name,url,callbackName)}loader.requestNotify(notifiee)}function nameFromUrl(url){return url.replace(/[\:\/\%\?\&\.\=\-]/g,"_")+"_api"}var Loader=function(name,url,callbackName){this.instances=[];this.callbackName=callbackName;if(this.callbackName){window[this.callbackName]=this.success.bind(this)}else{if(url.indexOf(this.callbackMacro)>=0){this.callbackName=name+"_loaded";window[this.callbackName]=this.success.bind(this);url=url.replace(this.callbackMacro,this.callbackName)}else{throw"core-shared-api: a %%callback%% parameter is required in the API url"}}this.addScript(url)};Loader.prototype={callbackMacro:"%%callback%%",loaded:false,addScript:function(src){var script=document.createElement("script");script.src=src;script.onerror=this.error.bind(this);var s=document.querySelector("script");s.parentNode.insertBefore(script,s);this.script=script},removeScript:function(){if(this.script.parentNode){this.script.parentNode.removeChild(this.script)}this.script=null},error:function(){this.cleanup()},success:function(){this.loaded=true;this.cleanup();this.result=Array.prototype.slice.call(arguments);this.instances.forEach(this.provide,this);this.instances=null},cleanup:function(){delete window[this.callbackName]},provide:function(instance){instance.notify(instance,this.result)},requestNotify:function(instance){if(this.loaded){this.provide(instance)}else{this.instances.push(instance)}}}})();</script>
+</polymer-element>
+</div><div hidden><!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE
+The complete set of authors may be found at http://polymer.github.io/AUTHORS
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS
+-->
+
+
+<!--
+`core-signals` provides basic publish-subscribe functionality.
+
+Note: avoid using `core-signals` whenever you can use
+a controller (parent element) to mediate communication
+instead.
+
+To send a signal, fire a custom event of type `core-signal`, with
+a detail object containing `name` and `data` fields.
+
+    this.fire('core-signal', {name: 'hello', data: null});
+    
+To receive a signal, listen for `core-signal-<name>` event on a 
+`core-signal` element.
+
+  <core-signal on-core-signal-hello="{{helloSignal}}">
+
+You can fire a signal event from anywhere, and all 
+`core-signal` elements will receive the event, regardless
+of where they are in DOM.
+
+@group Polymer Core Elements
+@element core-signals
+@status stable
+@homepage github.io
+-->
+<polymer-element name="core-signals" assetpath="components/core-signals/">
+<script>(function(){Polymer("core-signals",{attached:function(){signals.push(this)},removed:function(){var i=signals.indexOf(this);if(i>=0){signals.splice(i,1)}}});var signals=[];function notify(name,data){var signal=new CustomEvent("core-signal-"+name,{bubbles:false,detail:data});signals.forEach(function(s){s.dispatchEvent(signal)})}document.addEventListener("core-signal",function(e){notify(e.detail.name,e.detail.data)})})();</script>
 </polymer-element>
 </div><div hidden><!--
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
@@ -3787,6 +3933,52 @@ To change the radio unchecked color:
 </polymer-element>
 </div><div hidden><!--
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+
+<polymer-element name="core-transition-css" extends="core-transition" attributes="transitionType" assetpath="components/core-transition/">
+<template>
+  <style no-shim="">:host(.core-transition){outline:0;overflow:hidden;opacity:0;transition:transform .2s ease-in-out,opacity .2s ease-in;-webkit-transition:-webkit-transform .2s ease-in-out,opacity .2s ease-in}:host(.core-transition.core-opened){opacity:1;transform:none;-webkit-transform:none}:host(.core-transition-center){transform:scale(0.5);-webkit-transform:scale(0.5)}:host(.core-transition-top){transform:translateY(-200%);-webkit-transform:translateY(-200%)}:host(.core-transition-bottom){transform:translateY(200%);-webkit-transform:translateY(200%)}:host(.core-transition-left){transform:translateX(-200%);-webkit-transform:translateX(-200%)}:host(.core-transition-right){transform:translateX(200%);-webkit-transform:translateX(200%)}</style>
+</template>
+<script>Polymer("core-transition-css",{baseClass:"core-transition",openedClass:"core-opened",closedClass:"core-closed",completeEventName:"transitionend",registerCallback:function(element){this.transitionStyle=element.templateContent().firstElementChild},fetchTemplate:function(){return null},go:function(node,state){if(state.opened!==undefined){this.transitionOpened(node,state.opened)}},setup:function(node){if(!node._hasTransitionStyle){if(!node.shadowRoot){node.createShadowRoot().innerHTML="<content></content>"}this.installScopeStyle(this.transitionStyle,"transition",node.shadowRoot);node._hasTransitionStyle=true;node.classList.add(this.baseClass);if(this.transitionType){node.classList.add(this.baseClass+"-"+this.transitionType)}}},transitionOpened:function(node,opened){this.listenOnce(node,this.completeEventName,function(){node.classList.toggle(this.revealedClass,opened);if(!opened){node.classList.remove(this.closedClass)}this.complete(node)});node.classList.toggle(this.openedClass,opened);node.classList.toggle(this.closedClass,!opened)}});</script>
+</polymer-element>
+
+<core-transition-css id="core-transition-fade"></core-transition-css>
+<core-transition-css id="core-transition-center" transitiontype="center"></core-transition-css>
+<core-transition-css id="core-transition-top" transitiontype="top"></core-transition-css>
+<core-transition-css id="core-transition-bottom" transitiontype="bottom"></core-transition-css>
+<core-transition-css id="core-transition-left" transitiontype="left"></core-transition-css>
+<core-transition-css id="core-transition-right" transitiontype="right"></core-transition-css>
+
+
+<polymer-element name="paper-dialog-transition" extends="core-transition-css" assetpath="components/paper-dialog/">
+
+<template>
+  <style no-shim="">:host(.paper-dialog-transition){outline:0;opacity:0;transition:transform .2s cubic-bezier(0.4,0,.2,1),opacity .2s cubic-bezier(0.4,0,.2,1);-webkit-transition:-webkit-transform .2s cubic-bezier(0.4,0,.2,1),opacity .2s cubic-bezier(0.4,0,.2,1)}:host(.paper-dialog-transition.core-opened){opacity:1;transform:none;-webkit-transform:none}:host(.paper-dialog-transition-bottom){transform:scale(0.9) translateY(200%);-webkit-transform:scale(0.9) translateY(200%)}:host(.paper-dialog-transition-center.core-opened){animation:paper-dialog-transition-center-keyframes .2s cubic-bezier(0.4,0,.2,1);-webkit-animation:paper-dialog-transition-center-keyframes .2s cubic-bezier(0.4,0,.2,1)}@keyframes paper-dialog-transition-center-keyframes{0%{transform:scale(0.5) translateY(0);-webkit-transform:scale(0.5) translateY(0)}90%{transform:scale(1) translateY(-10px);-webkit-transform:scale(1) translateY(-10px)}100%{transform:scale(1) translateY(0);-webkit-transform:scale(1) translateY(0)}}@-webkit-keyframes paper-dialog-transition-center-keyframes{0%{transform:scale(0.5) translateY(0);-webkit-transform:scale(0.5) translateY(0)}90%{transform:scale(1) translateY(-10px);-webkit-transform:scale(1) translateY(-10px)}100%{transform:scale(1) translateY(0);-webkit-transform:scale(1) translateY(0)}}</style>
+</template>
+
+<script>Polymer("paper-dialog-transition",{baseClass:"paper-dialog-transition"});</script>
+
+</polymer-element>
+
+<paper-dialog-transition id="paper-dialog-transition-bottom" transitiontype="bottom"></paper-dialog-transition>
+<paper-dialog-transition id="paper-dialog-transition-center" transitiontype="center"></paper-dialog-transition></div><div hidden><!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE
 The complete set of authors may be found at http://polymer.github.io/AUTHORS
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS
@@ -3938,7 +4130,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>Polymer("paper-fab",{publish:{raisedButton:{value:true,reflect:true}}});</script>
 </polymer-element>
-</div><div hidden>undefined</div><div hidden>undefined</div><div hidden><!--
+</div><div hidden>undefined</div><div hidden>
+
+<style>html /deep/ [novanish]{min-height:8px}design-frame /deep/ paper-row{border:1px dotted rgba(240,240,240,.5);border-radius:8px;margin:-1px -1px}</style>
+
+<polymer-element name="paper-group" segment="" horizontal="" layout="" wrap="" novanish="" noscript="" assetpath="components/paper-form/"></polymer-element>
+
+<polymer-element name="paper-row" horizontal="" layout="" center="" wrap="" novanish="" noscript="" assetpath="components/paper-form/"></polymer-element>
+
+<polymer-element name="field-validator" attributes="value editValue errorText invalidated" extends="core-meta" type="validator" id="numchars" assetpath="components/paper-form/">
+<script>Polymer("field-validator",{errorText:"Failed to validate",validate:function(field){field.error=this.errorText;field.invalidated=field.value&&field.value.length<5}});</script>
+</polymer-element>
+
+<polymer-element name="paper-form" vertical="" layout="" assetpath="components/paper-form/">
+<script>Polymer("paper-form",{eventDelegates:{"add-form-field":"addField","remove-form-field":"removeField","validate-form-field":"validateFieldEvent"},created:function(){this.fields=[];this.validators=document.createElement("field-validator")},addField:function(e){this.fields.push(e.target)},removeField:function(e){var i=this.fields.indexOf(e.target);if(i>=0){this.fields.splice(i,1)}},dump:function(){var data={};this.fields.forEach(function(f){data[f.name]=f.value},this);return data},validate:function(){var valid=this.fields.every(function(f){this.validateField(f);return!f.invalidated},this);return valid},validateField:function(field){if(field.validator){var validator=this.validators.byId(field.validator);console.log("validator go",validator);if(validator){validator.validate(field)}}},validateFieldEvent:function(event){event.stopPropagation();this.validateField(event.target)}});</script>
+</polymer-element>
+
+</div><div hidden>undefined</div><div hidden><!--
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE
 The complete set of authors may be found at http://polymer.github.io/AUTHORS
@@ -4056,6 +4264,107 @@ Example:
   </template>
 
   <script>Polymer("paper-item",{publish:{label:"",iconSrc:{value:""},icon:{value:""}}});</script>
+</polymer-element>
+</div><div hidden><!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+
+
+<!--
+
+`paper-menu-button-overlay` is a helper class to position an overlay relative to another
+element, e.g. the button with a pulldown menu.
+
+@group Paper Elements
+@element paper-menu-button-overlay
+@extends core-overlay
+@homepage github.io
+-->
+
+<polymer-element name="paper-menu-button-overlay" extends="core-overlay" attributes="relatedTarget halign" assetpath="components/paper-menu-button/">
+  <script>Polymer("paper-menu-button-overlay",{publish:{relatedTarget:null,halign:"left"},updateTargetDimensions:function(){this.super();var t=this.target;this.target.cachedSize=t.getBoundingClientRect()},positionTarget:function(){if(this.relatedTarget){var rect=this.relatedTarget.getBoundingClientRect();if(this.halign==="left"){this.target.style.left=rect.left+"px"}else if(this.halign==="right"){this.target.style.right=window.innerWidth-rect.right+"px"}else{this.target.style.left=rect.left-(rect.width-this.target.cachedSize.width)/2+"px"}this.target.style.top=rect.top+"px"}else{this.super()}}});</script>
+</polymer-element>
+</div><div hidden><!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!--
+A `paper-menu-button` is a `paper-icon-button` that opens a drop down menu when tapped.
+
+Example:
+
+    <paper-menu-button icon="menu">
+      <div>Menu Item 1</div>
+      <div>Menu Item 2</div>
+      <div>Menu Item 3</div>
+    </paper-menu-button>
+
+ @group Polymer Quantum Paper Elements
+ @element paper-menu-button
+ @extends paper-focusable
+-->
+
+
+
+
+
+
+<!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!--
+@group Paper Elements
+@class paper-menu-button-transition
+@extends core-transition-css
+-->
+
+
+
+
+<polymer-element name="paper-menu-button-transition" extends="core-transition-css" attributes="duration transformOrigin" assetpath="components/paper-menu-button/">
+  <template>
+    <style no-shim="">:host(.paper-menu-button-transition){outline:0;opacity:0;transition:transform .2s ease-in-out,opacity .2s ease-in;-webkit-transition:-webkit-transform .2s ease-in-out,opacity .2s ease-in}:host(.paper-menu-button-transition.paper-menu-button-opened){opacity:1;transform:none;-webkit-transform:none}</style>
+  </template>
+  <script>Polymer("paper-menu-button-transition",{baseClass:"paper-menu-button-transition",revealedClass:"paper-menu-button-revealed",openedClass:"paper-menu-button-opened",closedClass:"paper-menu-button-closed",duration:500,setup:function(node){this.super(arguments);var bg=node.querySelector(".paper-menu-button-overlay-bg");bg.style.transformOrigin=this.transformOrigin;bg.style.webkitTransformOrigin=this.transformOrigin},transitionOpened:function(node,opened){this.super(arguments);if(opened){if(this.player){this.player.cancel()}var anims=[];var ink=node.querySelector(".paper-menu-button-overlay-ink");var offset=40/Math.max(node.cachedSize.width,node.cachedSize.height);anims.push(new Animation(ink,[{opacity:.9,transform:"scale(0)"},{opacity:.9,transform:"scale(1)"}],{duration:this.duration*offset}));var bg=node.querySelector(".paper-menu-button-overlay-bg");anims.push(new Animation(bg,[{opacity:.9,transform:"scale("+40/node.cachedSize.width+","+40/node.cachedSize.height+")"},{opacity:1,transform:"scale(0.95, 0.5)"},{opacity:1,transform:"scale(1, 1)"}],{delay:this.duration*offset,duration:this.duration*(1-offset),fill:"forwards"}));console.log("node",node);var nodes=node.querySelector("core-menu::shadow content").getDistributedNodes().array();var items=nodes.filter(function(n){return n.nodeType===Node.ELEMENT_NODE});var itemDelay=offset+(1-offset)/2;var itemDuration=this.duration*(1-itemDelay)/(items.length-1);items.forEach(function(item,i){anims.push(new Animation(item,[{opacity:0},{opacity:1}],{delay:this.duration*itemDelay+itemDuration*i,duration:itemDuration,fill:"both"}))}.bind(this));var shadow=node.querySelector("paper-shadow");anims.push(new Animation(shadow,function(t,target){if(t>offset*2&&shadow.z===0){shadow.z=1}},{duration:this.duration}));var group=new AnimationGroup(anims,{easing:"cubic-bezier(0.4, 0, 0.2, 1)"});this.player=document.timeline.play(group)}}});</script>
+</polymer-element>
+
+<paper-menu-button-transition id="paper-menu-button-transition-top-left" transformorigin="0% 0%"></paper-menu-button-transition>
+<paper-menu-button-transition id="paper-menu-button-transition-top-right" transformorigin="100% 0%"></paper-menu-button-transition>
+<paper-menu-button-transition id="paper-menu-button-transition-top-right-slow" transformorigin="100% 0%" duration="10000"></paper-menu-button-transition>
+
+
+<polymer-element name="paper-menu-button" extends="paper-focusable" attributes="src icon opened halign slow" on-tap="{{tapAction}}" assetpath="components/paper-menu-button/">
+  <template>
+    <style>:host{display:inline-block;padding:8px;position:relative;background-image:none;outline:0;user-select:none;-webkit-user-select:none;cursor:pointer;overflow:hidden}:host([disabled]){cursor:auto}core-icon{position:relative}core-icon::shadow svg{transition:transform .2s cubic-bezier(0.4,0,.2,1);-webkit-transition:-webkit-transform .2s cubic-bezier(0.4,0,.2,1);transform-origin:50% 50%;-webkit-transform-origin:50% 50%}:host(:hover) core-icon::shadow svg{transform:scale(1.2);-webkit-transform:scale(1.2)}:host([disabled]:hover) core-icon::shadow svg{transform:none;-webkit-transform:none}:host([disabled]) core-icon::shadow path{fill:#c9c9c9}#overlay{position:fixed;border-radius:3px}.paper-menu-button-overlay-ink{position:absolute;top:0;left:0;width:40px;height:40px;border-radius:20px;background:#fff;opacity:0;transform:scale(0);-webkit-transform:scale(0)}:host([halign=right]) .paper-menu-button-overlay-ink{left:auto;right:0}.paper-menu-button-overlay-bg{position:absolute;top:0;left:0;bottom:0;right:0;border-radius:3px;background:#fff;opacity:0}#menu{position:relative;margin:0}</style>
+    <paper-menu-button-overlay target="{{$.overlay}}" relatedtarget="{{}}" halign="{{halign}}" opened="{{opened}}" transition="paper-menu-button-transition-top-{{halign}}{{slow ? &apos;-slow&apos; : &apos;&apos;}}"></paper-menu-button-overlay>
+    <div id="overlay">
+      <paper-shadow target="{{$.overlayBg}}" z="0" hasposition=""></paper-shadow>
+      <div class="paper-menu-button-overlay-ink"></div>
+      <div id="overlayBg" class="paper-menu-button-overlay-bg">
+      </div>
+      <core-menu id="menu">
+        <content></content>
+      </core-menu>
+    </div>
+    <core-icon src="{{src}}" icon="{{icon}}"></core-icon>
+  </template>
+  <script>Polymer("paper-menu-button",{publish:{opened:{value:false,reflect:true},halign:{value:"left",reflect:true}},src:"",icon:"",slow:false,tapAction:function(){if(this.disabled){return}this.super();this.toggle()},toggle:function(){this.opened=!this.opened}});</script>
 </polymer-element>
 </div><div hidden><!--
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
@@ -4278,48 +4587,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <!--
-`paper-tabs` is a `core-selector` styled to look like tabs. Tabs make it easy to 
-explore and switch between different views or functional aspects of an app, or 
-to browse categorized data sets.
-
-Use `selected` property to get or set the selected tab.
-
-Example:
-
-    <paper-tabs selected="0">
-      <paper-tab>TAB 1</paper-tab>
-      <paper-tab>TAB 2</paper-tab>
-      <paper-tab>TAB 3</paper-tab>
-    </paper-tabs>
-
-See <a href="../paper-tab/">paper-tab</a> for more information about 
-`paper-tab`.
-
-Styling tabs:
-
-To change the sliding bar color:
-
-    paper-tabs.pink::shadow #selectionBar {
-      background-color: #ff4081;
-    }
-
-@group Quantum Paper Elements
-@element paper-tabs
-@extends core-selector
-@homepage github.io
--->
-
-
-<!--
-Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
-<!--
 `paper-tab` is styled to look like a tab.  It should be used in conjunction with
 `paper-tabs`.
 
@@ -4361,6 +4628,48 @@ To change the ink color:
 </template>
 <script>Polymer("paper-tab",{noink:false});</script>
 </polymer-element>
+</div><div hidden><!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!--
+`paper-tabs` is a `core-selector` styled to look like tabs. Tabs make it easy to 
+explore and switch between different views or functional aspects of an app, or 
+to browse categorized data sets.
+
+Use `selected` property to get or set the selected tab.
+
+Example:
+
+    <paper-tabs selected="0">
+      <paper-tab>TAB 1</paper-tab>
+      <paper-tab>TAB 2</paper-tab>
+      <paper-tab>TAB 3</paper-tab>
+    </paper-tabs>
+
+See <a href="../paper-tab/">paper-tab</a> for more information about 
+`paper-tab`.
+
+Styling tabs:
+
+To change the sliding bar color:
+
+    paper-tabs.pink::shadow #selectionBar {
+      background-color: #ff4081;
+    }
+
+@group Quantum Paper Elements
+@element paper-tabs
+@extends core-selector
+@homepage github.io
+-->
+
+
 
 
 <polymer-element name="paper-tabs" extends="core-selector" attributes="noink nobar" assetpath="components/paper-tabs/">
@@ -4441,30 +4750,6 @@ the toast will automatically fits at the bottom of the screen.
 -->
 
 
-<!--
-Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
-
-
-<polymer-element name="core-transition-css" extends="core-transition" attributes="transitionType" assetpath="components/core-transition/">
-<template>
-  <style no-shim="">:host(.core-transition){outline:0;overflow:hidden;opacity:0;transition:transform .2s ease-in-out,opacity .2s ease-in;-webkit-transition:-webkit-transform .2s ease-in-out,opacity .2s ease-in}:host(.core-transition.core-opened){opacity:1;transform:none;-webkit-transform:none}:host(.core-transition-center){transform:scale(0.5);-webkit-transform:scale(0.5)}:host(.core-transition-top){transform:translateY(-200%);-webkit-transform:translateY(-200%)}:host(.core-transition-bottom){transform:translateY(200%);-webkit-transform:translateY(200%)}:host(.core-transition-left){transform:translateX(-200%);-webkit-transform:translateX(-200%)}:host(.core-transition-right){transform:translateX(200%);-webkit-transform:translateX(200%)}</style>
-</template>
-<script>Polymer("core-transition-css",{baseClass:"core-transition",openedClass:"core-opened",closedClass:"core-closed",completeEventName:"transitionend",registerCallback:function(element){this.transitionStyle=element.templateContent().firstElementChild},fetchTemplate:function(){return null},go:function(node,state){if(state.opened!==undefined){this.transitionOpened(node,state.opened)}},setup:function(node){if(!node._hasTransitionStyle){if(!node.shadowRoot){node.createShadowRoot().innerHTML="<content></content>"}this.installScopeStyle(this.transitionStyle,"transition",node.shadowRoot);node._hasTransitionStyle=true;node.classList.add(this.baseClass);if(this.transitionType){node.classList.add(this.baseClass+"-"+this.transitionType)}}},transitionOpened:function(node,opened){this.listenOnce(node,this.completeEventName,function(){node.classList.toggle(this.revealedClass,opened);if(!opened){node.classList.remove(this.closedClass)}this.complete(node)});node.classList.toggle(this.openedClass,opened);node.classList.toggle(this.closedClass,!opened)}});</script>
-</polymer-element>
-
-<core-transition-css id="core-transition-fade"></core-transition-css>
-<core-transition-css id="core-transition-center" transitiontype="center"></core-transition-css>
-<core-transition-css id="core-transition-top" transitiontype="top"></core-transition-css>
-<core-transition-css id="core-transition-bottom" transitiontype="bottom"></core-transition-css>
-<core-transition-css id="core-transition-left" transitiontype="left"></core-transition-css>
-<core-transition-css id="core-transition-right" transitiontype="right"></core-transition-css>
 
 
 
