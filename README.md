@@ -10,3 +10,20 @@ Polymer-full is probably not suited for production environments, also there's a 
 
 Demo
 ----
+[Check a copy of the Polymer official sampler, done with polymer-full.](http://fabrizioballiano.net/polymer-full/demo/)
+
+How to use it
+-------------
+
+Download a release of polymer-full and extract to your project root directory.
+Then create your first polymer page (check official polymer documentation on how to do that) but instead of including platform.js and then every single polymer component you need simply add these 2 lines:
+
+    <script src="polymer-full.js"></script>
+    <link rel="import" href="polymer-full.html">
+
+That's it.
+
+License and copyright
+---------------------
+
+Everything is copyright by Polymer Authors, check [Polymer website](http://www.polymer-project.org/) for every details.
