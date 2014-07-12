@@ -1,7 +1,7 @@
 polymer-full
 ============
 
-A vulcanized version of all polymer core/paper components in a single file file.
+A vulcanized version of all polymer core/paper components in a single file.
 
 If you want to test polymer and start prototyping a web app without having to manually include every polymer component you'll need, simply include just polymer-full and you'll be done!
 You'll have all the stable components ready to use with no hassle.
