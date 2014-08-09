@@ -18,7 +18,7 @@ How to use it
 Download a release of polymer-full and extract to your project root directory.
 Then create your first polymer page (check official polymer documentation on how to do that) but instead of including platform.js and then every single polymer component you need simply add these 2 lines:
 
-    <script src="polymer-full.js"></script>
+    <script src="platform.js"></script>
     <link rel="import" href="polymer-full.html">
 
 That's it.
