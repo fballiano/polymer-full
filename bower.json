@@ -12,7 +12,10 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer",
-    "core-elements": "Polymer/core-elements",
-    "paper-elements": "Polymer/paper-elements"
+    "paper-elements": "PolymerElements/paper-elements",
+    "iron-elements": "PolymerElements/iron-elements",
+    "gold-elements": "PolymerElements/gold-elements",
+    "platinum-elements": "PolymerElements/platinum-elements",
+    "neon-elements": "PolymerElements/neon-elements"
   }
 }
