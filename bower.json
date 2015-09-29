@@ -1,8 +1,11 @@
 {
   "name": "polymer-full",
   "version": "0.0.0",
+  "description": "",
+  "main": "",
+  "moduleType": [],
   "license": "MIT",
-  "private": true,
+  "homepage": "",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -11,11 +14,13 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer",
-    "paper-elements": "PolymerElements/paper-elements",
+    "polymer": "Polymer/polymer#~1.1.4",
     "iron-elements": "PolymerElements/iron-elements",
+    "paper-elements": "PolymerElements/paper-elements",
     "gold-elements": "PolymerElements/gold-elements",
+    "neon-elements": "PolymerElements/neon-elements",
     "platinum-elements": "PolymerElements/platinum-elements",
-    "neon-elements": "PolymerElements/neon-elements"
+    "molecules": "PolymerElements/molecules",
+    "google-web-components": "GoogleWebComponents/google-web-components"
   }
 }

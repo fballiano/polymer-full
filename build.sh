@@ -1,5 +1,6 @@
 #!/bin/bash
 
+bower update
 php polymer-full-src.php > polymer-full-src.html
-vulcanize --strip --inline polymer-full-src.html --output polymer-full.html
+vulcanize --inline-scripts --inline-css --strip-comments polymer-full-src.html > polymer-full.html
 cp ./bower_components/webcomponentsjs/webcomponents-lite.min.js .
