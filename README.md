@@ -1,3 +1,10 @@
+PROJECT DISCONTINUED
+====================
+
+After polymer 1.0 it was pretty clear that the team completely revolutionize the way how a polymer project should be developed. As of now it really doesn't make sense anymore trying to generate a big css/js containing all polymer components, it would be MBs big and it wouldn't be usable anyway.
+
+I really suggest you to check [https://github.com/material-components/material-components-web] which is the right way to go now (Dec 2016/Early 2017).
+
 polymer-full
 ============
 
